@@ -1,0 +1,396 @@
+/* Dashboard page — StadiumIQ Ops */
+
+.page {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  grid-template-rows: auto 1fr;
+  height: calc(100vh - var(--nav-height));
+  overflow: hidden;
+  background: var(--surface-00);
+}
+
+/* ── Top header (full-width) ────────────── */
+.header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem clamp(1rem, 3vw, 1.75rem);
+  border-bottom: 1px solid var(--surface-border);
+  background: var(--surface-01);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.headerTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.headerSub {
+  font-size: 0.76rem;
+  color: var(--text-tertiary);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ── Main heatmap column ─────────────────── */
+.mainCol {
+  overflow-y: auto;
+  padding: 1.25rem clamp(0.75rem, 2vw, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Health metrics strip ─────────────────── */
+.healthStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.healthCard {
+  background: var(--surface-01);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.healthLabel {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-tertiary);
+}
+
+.healthValue {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.healthMeta {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+/* ── Heatmap section ─────────────────────── */
+.heatmapSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.staleBadge {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.5rem;
+  background: var(--status-warn-dim);
+  color: var(--status-warn);
+  border-radius: var(--radius-pill);
+  font-variant-numeric: tabular-nums;
+}
+
+.heatmapCard {
+  background: var(--surface-01);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.heatmapGrid {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+}
+
+.heatCell {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  position: relative;
+  cursor: default;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  min-width: 28px;
+  min-height: 28px;
+}
+
+.heatCell:hover {
+  opacity: 0.85;
+  transform: scale(1.08);
+  z-index: 2;
+}
+
+.heatCell--choke {
+  box-shadow: 0 0 0 2px var(--status-critical);
+  animation: chokeFlash 1.5s ease-in-out infinite;
+}
+
+@keyframes chokeFlash {
+  0%, 100% { box-shadow: 0 0 0 2px var(--status-critical); }
+  50%       { box-shadow: 0 0 8px 2px rgba(239,68,68,0.6); }
+}
+
+.cellLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: rgba(255,255,255,0.7);
+  pointer-events: none;
+}
+
+/* ── Heatmap legend ───────────────────── */
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.68rem;
+  color: var(--text-tertiary);
+}
+
+.legendSwatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ── Right sidebar ────────────────────── */
+.sidebar {
+  border-left: 1px solid var(--surface-border);
+  background: var(--surface-01);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarSection {
+  padding: 1rem;
+  border-bottom: 1px solid var(--surface-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sidebarSectionTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+/* ── Alert cards ─────────────────────── */
+.alertCard {
+  background: var(--surface-02);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border: 1px solid var(--surface-border);
+  animation: slideInRight 0.25s ease forwards;
+}
+
+.alertCard--critical {
+  border-color: rgba(239,68,68,0.4);
+  background: rgba(239,68,68,0.06);
+}
+
+.alertCard--warning {
+  border-color: rgba(245,158,11,0.35);
+  background: rgba(245,158,11,0.05);
+}
+
+.alertCard--advisory {
+  border-color: rgba(59,130,246,0.25);
+}
+
+.alertTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.alertZone {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.alertBody {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.alertBrief {
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  background: var(--surface-03);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.6rem;
+  line-height: 1.5;
+  border-left: 2px solid var(--ai-primary);
+}
+
+.alertBriefLabel {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ai-primary);
+  margin-bottom: 0.2rem;
+}
+
+.alertActions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+/* ── Escalation tickets ─────────────── */
+.escalationCard {
+  background: var(--surface-02);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  padding: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  animation: slideInRight 0.2s ease forwards;
+}
+
+.escalationLang {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+.escalationMsg {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.escalationTime {
+  font-size: 0.68rem;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.emptyState {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.emptyIcon { font-size: 1.5rem; opacity: 0.5; }
+
+/* ── Refresh bar ─────────────────────── */
+.refreshBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--surface-00);
+  border-top: 1px solid var(--surface-border);
+  font-size: 0.68rem;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  gap: 0.5rem;
+}
+
+.refreshDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--status-ok);
+  display: inline-block;
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+/* ── Mobile collapse ─────────────────── */
+@media (max-width: 900px) {
+  .page {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+  .sidebar {
+    border-left: none;
+    border-top: 1px solid var(--surface-border);
+    max-height: 280px;
+  }
+}

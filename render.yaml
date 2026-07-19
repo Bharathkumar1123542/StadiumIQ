@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: stadiumiq-backend
+    env: docker
+    dockerfilePath: agent/Dockerfile
+    buildCommand: ""
+    startCommand: ""
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: OPENAI_API_KEY
+        fromSecret: OPENAI_API_KEY
+      - key: GEMINI_API_KEY
+        fromSecret: GEMINI_API_KEY
+      - key: OPENAI_MODEL
+        value: gpt-4o
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
+      - key: NEXT_BASE_URL
+        value: http://localhost:3000
+      - key: PORT
+        value: "${PORT}"

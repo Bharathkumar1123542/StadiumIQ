@@ -26,6 +26,23 @@ def _venue_name(venue_id: str) -> str:
     return VENUES.get(venue_id, {}).get("name", venue_id)
 
 
+def _abbrev_session_id(session_id: str, max_chars: int = 8) -> str:
+    """Return an abbreviated session ID safe for log output.
+
+    Truncates to *max_chars* characters and appends ``…`` when the ID is
+    longer, preventing excessively long log lines while retaining enough
+    context for correlation.
+
+    >>> _abbrev_session_id("sess_abc123xyz", 8)
+    'sess_abc…'
+    >>> _abbrev_session_id("short", 8)
+    'short'
+    """
+    if len(session_id) > max_chars:
+        return session_id[:max_chars] + "…"
+    return session_id
+
+
 @router.post("/chat", response_model=AgentTurnResult)
 async def chat(raw: Request) -> JSONResponse:
     """Process a fan concierge chat turn.
@@ -80,7 +97,7 @@ async def chat(raw: Request) -> JSONResponse:
 
     logger.info(
         "[chat] session=%r venue=%r lang=%r rag_hits=%d",
-        req.session_id[:8] + "…" if len(req.session_id) > 8 else req.session_id,
+        _abbrev_session_id(req.session_id),
         req.venue_id,
         req.language_code,
         len(rag_docs),
@@ -96,7 +113,7 @@ async def chat(raw: Request) -> JSONResponse:
 
     logger.info(
         "[chat] done session=%r provider=%r latency_ms=%d",
-        req.session_id[:8] + "…" if len(req.session_id) > 8 else req.session_id,
+        _abbrev_session_id(req.session_id),
         result.llm_provider,
         result.total_latency_ms,
     )

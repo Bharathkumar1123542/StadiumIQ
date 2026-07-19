@@ -117,7 +117,7 @@ class VectorStore:
                 try:
                     data = json.loads(path.read_text(encoding="utf-8"))
                     docs.append(data)
-                except Exception as e:
+                except (OSError, json.JSONDecodeError, ValueError) as e:
                     logger.warning("[RAG] Skipping %s: %s", path.name, e)
 
         try:

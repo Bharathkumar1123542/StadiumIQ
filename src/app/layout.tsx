@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
 import { NavBar } from '@/components/shared/NavBar';
+import { SkipLink } from '@/components/shared/SkipLink';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -31,24 +32,7 @@ export default function RootLayout({
       </head>
       <body>
         {/* Skip-to-content link for keyboard/screen-reader users */}
-        <a
-          href="#main-content"
-          className="sr-only"
-          style={{
-            // Override sr-only on :focus so the link becomes visible
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.cssText =
-              'position:fixed;top:8px;left:8px;z-index:99999;padding:0.5rem 1rem;' +
-              'background:var(--ai-primary);color:#fff;border-radius:6px;font-weight:600;' +
-              'width:auto;height:auto;clip:auto;overflow:visible;white-space:nowrap;';
-          }}
-          onBlur={(e) => {
-            e.currentTarget.removeAttribute('style');
-          }}
-        >
-          Skip to main content
-        </a>
+        <SkipLink />
 
         <div className="page-wrapper">
           {/* NavBar uses useSearchParams → must be wrapped in Suspense */}

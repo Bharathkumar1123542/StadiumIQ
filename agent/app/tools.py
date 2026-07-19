@@ -1,8 +1,14 @@
 """
 Agent tool definitions — GPT-4o function-calling schemas and executors.
+
 Each tool has:
   - A JSON schema for the LLM's function-calling list
   - An async executor that calls the appropriate internal or external service
+
+The shared ``_http_client`` is intentionally module-level so that the
+underlying TCP connection pool is reused across all async tool calls within a
+process.  Call :func:`close_http_client` during application shutdown (via the
+FastAPI lifespan hook) to release those connections cleanly.
 """
 from __future__ import annotations
 
@@ -15,8 +21,19 @@ from .models import ToolCallResult  # noqa: F401 — re-exported for convenience
 logger = logging.getLogger(__name__)
 
 # Shared async HTTP client — reuses connection pool across tool calls
-# (avoids a new TCP handshake per crowd_density / emergency_escalate call)
+# (avoids a new TCP handshake per crowd_density / emergency_escalate call).
+# Must be closed via close_http_client() during application shutdown.
 _http_client = httpx.AsyncClient(timeout=5.0)
+
+
+async def close_http_client() -> None:
+    """Close the shared HTTP client and release all pooled connections.
+
+    Must be called once during application shutdown (e.g. from the FastAPI
+    lifespan ``finally`` block) to avoid resource-leak warnings from httpx.
+    Safe to call multiple times — httpx raises no error on double-close.
+    """
+    await _http_client.aclose()
 
 # ── Tool JSON schemas (sent to GPT-4o in every request) ──────────
 

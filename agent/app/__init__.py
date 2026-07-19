@@ -10,6 +10,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import chat, crowd
 from .rag import VectorStore
+from .tools import close_http_client
+from .config import CORS_ORIGINS
 
 # ── Logging configuration ─────────────────────────────────────────
 logging.config.dictConfig({
@@ -38,14 +40,26 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup: pre-load vector store so first request is fast."""
+    """Manage startup and shutdown of shared resources.
+
+    Startup:
+      - Pre-loads the RAG vector store so the first request is not penalised
+        by cold-start embedding time.
+
+    Shutdown:
+      - Closes the shared httpx AsyncClient to release pooled TCP connections
+        cleanly before the process exits.
+    """
     logger.info("[StadiumIQ] Loading RAG vector store…")
     store = VectorStore()
     await store.build_index()
     app.state.vector_store = store
     logger.info("[StadiumIQ] Vector store ready — %d chunks indexed", store.doc_count)
-    yield
-    logger.info("[StadiumIQ] Agent shutting down")
+    try:
+        yield
+    finally:
+        logger.info("[StadiumIQ] Agent shutting down — closing HTTP client")
+        await close_http_client()
 
 
 app = FastAPI(
@@ -57,7 +71,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Next.js dev server
+    allow_origins=CORS_ORIGINS,  # Configurable via CORS_ORIGINS env var
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],
 )
